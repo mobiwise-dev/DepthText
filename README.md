@@ -17,6 +17,7 @@ It is the spiritual successor of ztext.js, but rewritten from scratch with a cle
 - 🦾 **Accessibility-friendly** (`aria-hidden`, reduced-motion support)
 - 🔥 **No dependencies**, only 4–6 KB minified
 - 📦 Works with bundlers, ES modules, and browsers
+- 🖼️ **Supports images, SVGs, and emojis** within text content
 
 ---
 
@@ -157,19 +158,19 @@ DepthText is framework-agnostic. You can use it with React, Vue, Angular, Svelte
 ### React / Next.js
 
 ```jsx
-import { useEffect, useRef } from 'react';
-import { DepthTextInstance } from 'depthtext';
+import { useEffect, useRef } from "react";
+import { DepthTextInstance } from "depthtext";
 
 export default function DepthComponent() {
   const textRef = useRef(null);
 
   useEffect(() => {
     if (!textRef.current) return;
-    
+
     const dt = new DepthTextInstance(textRef.current, {
       layers: 10,
       depth: "1rem",
-      event: "pointer"
+      event: "pointer",
     });
 
     // Cleanup on unmount
@@ -184,24 +185,24 @@ export default function DepthComponent() {
 
 ```html
 <script setup>
-import { onMounted, onUnmounted, ref } from 'vue';
-import { DepthTextInstance } from 'depthtext';
+  import { onMounted, onUnmounted, ref } from "vue";
+  import { DepthTextInstance } from "depthtext";
 
-const textRef = ref(null);
-let dt = null;
+  const textRef = ref(null);
+  let dt = null;
 
-onMounted(() => {
-  if (textRef.value) {
-    dt = new DepthTextInstance(textRef.value, {
-      layers: 10,
-      event: 'pointer'
-    });
-  }
-});
+  onMounted(() => {
+    if (textRef.value) {
+      dt = new DepthTextInstance(textRef.value, {
+        layers: 10,
+        event: "pointer",
+      });
+    }
+  });
 
-onUnmounted(() => {
-  if (dt) dt.destroy();
-});
+  onUnmounted(() => {
+    if (dt) dt.destroy();
+  });
 </script>
 
 <template>
@@ -212,21 +213,21 @@ onUnmounted(() => {
 ### Angular
 
 ```ts
-import { Component, ElementRef, ViewChild, AfterViewInit, OnDestroy } from '@angular/core';
-import { DepthTextInstance } from 'depthtext';
+import { Component, ElementRef, ViewChild, AfterViewInit, OnDestroy } from "@angular/core";
+import { DepthTextInstance } from "depthtext";
 
 @Component({
-  selector: 'app-depth-text',
-  template: '<h1 #depthText>DepthText in Angular</h1>'
+  selector: "app-depth-text",
+  template: "<h1 #depthText>DepthText in Angular</h1>",
 })
 export class DepthTextComponent implements AfterViewInit, OnDestroy {
-  @ViewChild('depthText') textRef!: ElementRef;
+  @ViewChild("depthText") textRef!: ElementRef;
   private dt?: DepthTextInstance;
 
   ngAfterViewInit() {
     this.dt = new DepthTextInstance(this.textRef.nativeElement, {
       layers: 10,
-      event: 'pointer'
+      event: "pointer",
     });
   }
 
@@ -236,10 +237,40 @@ export class DepthTextComponent implements AfterViewInit, OnDestroy {
 }
 ```
 
+## 🎭 Supported Content
+
+DepthText works with various content types:
+
+### ✅ Fully Supported
+
+- **Text content** (including unicode, special characters)
+- **Emojis** (😊, 🚀, ❤️, etc.)
+- **Inline SVG** (`<svg>...</svg>`)
+- **Images** (`<img src="...">`)
+- **Mixed content** (text + images + SVGs together)
+
+### Example with mixed content:
+
+```html
+<h1 class="depthtext" data-depth="5" data-depth-event="pointer">
+  Hello World! 🚀
+  <svg width="30" height="30"><circle cx="15" cy="15" r="10" fill="blue" /></svg>
+  <img src="logo.png" width="40" alt="Logo" />
+</h1>
+```
+
+### ⚠️ Notes
+
+Images should be loaded before initialization for best results.
+Very large images may impact performance.
+External SVGs (<img src="icon.svg">) work like regular images.
+
 ## 🐛 Known Issues & Notes
 
 - DepthText uses CSS transforms; parent elements must not flatten 3D contexts.
 - Avoid nested DepthText unless you understand `transform-style: preserve-3d`.
+- **Images**: For complex layouts, consider using `background-image` on wrapper elements.
+- **Performance**: Very high layer counts (>25) with large images may impact performance.
 
 ---
 
