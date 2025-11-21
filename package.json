@@ -1,6 +1,6 @@
 {
   "name": "depthtext",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "High-performance 3D layered text with pointer and scroll interactions (TypeScript ready, ESM/CJS/UMD builds).",
   "main": "dist/depthtext.cjs",
   "module": "dist/depthtext.mjs",
