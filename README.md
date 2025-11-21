@@ -2,6 +2,8 @@
 
 # DepthText
 
+[![npm version](https://img.shields.io/npm/v/depthtext.svg?style=flat-square)](https://www.npmjs.com/package/depthtext) [![npm downloads](https://img.shields.io/npm/dm/depthtext.svg?style=flat-square)](https://www.npmjs.com/package/depthtext) [![bundle size](https://img.shields.io/bundlephobia/minzip/depthtext?style=flat-square)](https://bundlephobia.com/package/depthtext) [![jsdelivr hits](https://img.shields.io/jsdelivr/npm/hm/depthtext?style=flat-square)](https://www.jsdelivr.com/package/npm/depthtext) [![GitHub license](https://img.shields.io/github/license/MobiWise-dev/DepthText?style=flat-square)](https://github.com/MobiWise-dev/DepthText/blob/main/LICENSE) [![GitHub stars](https://img.shields.io/github/stars/MobiWise-dev/DepthText?style=flat-square)](https://github.com/MobiWise-dev/DepthText/stargazers)
+
 DepthText is a lightweight, dependency-free JavaScript library that creates smooth multi-layer 3D text with depth, parallax, and interactive rotation.  
 Designed for high performance, accessibility, and modern UX motion guidelines.
 
@@ -30,6 +32,40 @@ It is the spiritual successor of ztext.js, but rewritten from scratch with a cle
 
 ```bash
 npm install depthtext
+```
+
+### CDN
+
+#### jsDelivr (Recommended)
+
+```html
+<!-- ESM -->
+<script type="module">
+  import { DepthTextify } from "https://cdn.jsdelivr.net/npm/depthtext@latest/dist/depthtext.mjs";
+  DepthTextify();
+</script>
+
+<!-- Global/IIFE (classic script tag) -->
+<script src="https://cdn.jsdelivr.net/npm/depthtext@latest/dist/depthtext.global.js"></script>
+<script>
+  DepthText.DepthTextify();
+</script>
+```
+
+#### unpkg
+
+```html
+<!-- ESM -->
+<script type="module">
+  import { DepthTextify } from "https://unpkg.com/depthtext@latest/dist/depthtext.mjs";
+  DepthTextify();
+</script>
+
+<!-- Global/IIFE -->
+<script src="https://unpkg.com/depthtext@latest/dist/depthtext.global.js"></script>
+<script>
+  DepthText.DepthTextify();
+</script>
 ```
 
 ### Import (ES module)
