@@ -1,3 +1,5 @@
+![Animation](./demo.png)
+
 # DepthText
 
 DepthText is a lightweight, dependency-free JavaScript library that creates smooth multi-layer 3D text with depth, parallax, and interactive rotation.  
@@ -18,6 +20,7 @@ It is the spiritual successor of ztext.js, but rewritten from scratch with a cle
 - 🔥 **No dependencies**, only 4–6 KB minified
 - 📦 Works with bundlers, ES modules, and browsers
 - 🖼️ **Supports images, SVGs, and emojis** within text content
+- 🎭 **Custom CSS classes** for advanced styling control
 
 ---
 
@@ -75,6 +78,7 @@ DepthText can be configured using either:
 | `data-depth-fade`           | boolean | `false` | Fade layers as depth increases                        |
 | `data-depth-eventdirection` | number  | `1`     | Invert pointer/scroll direction                       |
 | `data-depth-eventrotation`  | number  | `20`    | Max rotation angle on interaction                     |
+| `data-depth-add-class`      | string  | `""`    | Custom CSS class(es) to add to each layer             |
 
 ---
 
@@ -89,7 +93,89 @@ const instance = new DepthTextInstance(element, {
   fade: false,
   event: "pointer",
   eventRotation: 20,
+  addClass: "my-custom-class", // New option for custom styling
 });
+```
+
+---
+
+## 🎨 Custom Styling with `addClass`
+
+The new `addClass` option allows you to apply custom CSS classes to all depth layers for advanced styling control.
+
+### Basic Usage
+
+```html
+<h1 class="depthtext" data-depth="10" data-depth-event="pointer" data-depth-add-class="gradient-text">Stylized Text</h1>
+```
+
+```css
+.gradient-text {
+  background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+```
+
+### Multiple Classes
+
+You can add multiple classes separated by spaces:
+
+```js
+new DepthTextInstance(element, {
+  addClass: "gradient-text shadow-effect animated",
+});
+```
+
+Or via HTML:
+
+```html
+<div data-depth="5" data-depth-add-class="class1 class2 class3">Multi-styled text</div>
+```
+
+### Advanced Styling Examples
+
+```css
+/* Neon glow effect */
+.neon-glow {
+  color: #00ffff;
+  text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff;
+}
+
+/* Metallic gradient */
+.metallic {
+  background: linear-gradient(90deg, #c0c0c0, #e8e8e8, #c0c0c0);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Rainbow animation */
+@keyframes rainbow {
+  0%,
+  100% {
+    color: #ff0000;
+  }
+  16% {
+    color: #ff7f00;
+  }
+  33% {
+    color: #ffff00;
+  }
+  50% {
+    color: #00ff00;
+  }
+  66% {
+    color: #0000ff;
+  }
+  83% {
+    color: #8b00ff;
+  }
+}
+
+.rainbow-text {
+  animation: rainbow 3s linear infinite;
+}
 ```
 
 ---
@@ -137,6 +223,15 @@ You can style them globally:
 }
 ```
 
+With the `addClass` option, you can target specific instances:
+
+```css
+.depthtext-layer.my-style {
+  color: #ff6b6b;
+  font-weight: bold;
+}
+```
+
 ---
 
 ## 📦 Browser Usage (no bundler)
@@ -171,6 +266,7 @@ export default function DepthComponent() {
       layers: 10,
       depth: "1rem",
       event: "pointer",
+      addClass: "gradient-effect", // Custom styling
     });
 
     // Cleanup on unmount
@@ -196,6 +292,7 @@ export default function DepthComponent() {
       dt = new DepthTextInstance(textRef.value, {
         layers: 10,
         event: "pointer",
+        addClass: "custom-style",
       });
     }
   });
@@ -228,6 +325,7 @@ export class DepthTextComponent implements AfterViewInit, OnDestroy {
     this.dt = new DepthTextInstance(this.textRef.nativeElement, {
       layers: 10,
       event: "pointer",
+      addClass: "angular-depth-style",
     });
   }
 
@@ -252,7 +350,7 @@ DepthText works with various content types:
 ### Example with mixed content:
 
 ```html
-<h1 class="depthtext" data-depth="5" data-depth-event="pointer">
+<h1 class="depthtext" data-depth="5" data-depth-event="pointer" data-depth-add-class="colorful">
   Hello World! 🚀
   <svg width="30" height="30"><circle cx="15" cy="15" r="10" fill="blue" /></svg>
   <img src="logo.png" width="40" alt="Logo" />
@@ -265,7 +363,7 @@ Images should be loaded before initialization for best results.
 Very large images may impact performance.
 External SVGs (<img src="icon.svg">) work like regular images.
 
-## 🐛 Known Issues & Notes
+## 🛠 Known Issues & Notes
 
 - DepthText uses CSS transforms; parent elements must not flatten 3D contexts.
 - Avoid nested DepthText unless you understand `transform-style: preserve-3d`.
@@ -283,7 +381,7 @@ If you add a major feature, please include documentation updates.
 
 ## 📄 License
 
-MIT License — free to use in commercial and open-source projects.
+MIT License – free to use in commercial and open-source projects.
 
 ---
 

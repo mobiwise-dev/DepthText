@@ -1,5 +1,5 @@
 /**
- * DepthText v1.0.0 - TypeScript
+ * DepthText v1.0.1 - TypeScript
  * https://mobiwise.dev | https://github.com/mobiwise-dev/depthtext
  * MIT License | (c) 2025
  *
@@ -22,9 +22,10 @@ export interface DepthTextOptions {
   layers?: number | string;
   perspective?: string;
   engaged?: boolean | string;
+  addClass?: string; // New option to add a custom CSS class
 }
 
-export const DEPTHTEXT_DEFAULTS: Required<Pick<DepthTextOptions, "depth" | "direction" | "event" | "eventRotation" | "eventDirection" | "fade" | "layers" | "perspective" | "engaged">> = {
+export const DEPTHTEXT_DEFAULTS: Required<Pick<DepthTextOptions, "depth" | "direction" | "event" | "eventRotation" | "eventDirection" | "fade" | "layers" | "perspective" | "engaged" | "addClass">> = {
   depth: "1rem",
   direction: "both",
   event: "none",
@@ -34,6 +35,7 @@ export const DEPTHTEXT_DEFAULTS: Required<Pick<DepthTextOptions, "depth" | "dire
   layers: 10,
   perspective: "500px",
   engaged: true,
+  addClass: "", // By default, no additional class
 };
 
 /* ===========================================================================
@@ -45,18 +47,18 @@ type MaybeElement = HTMLElement | Element | null | any;
 const DEPTHTEXT_GLOBAL = {
   instances: new Set<DepthTextInstance>(),
   rafId: null as number | null,
-  
+
   // Target values (where we want to be)
   targetX: 0,
   targetY: 0,
-  
+
   // Current values (where we are currently)
   currentX: 0,
   currentY: 0,
-  
+
   // Smoothing factor (0.1 = smooth, 1 = instant)
   lerpFactor: 0.1,
-  
+
   // State
   isMoving: false,
   hasPointerListener: false,
@@ -73,7 +75,7 @@ const DEPTHTEXT_GLOBAL = {
     // Simple lerp: current = current + (target - current) * factor
     const dx = this.targetX - this.currentX;
     const dy = this.targetY - this.currentY;
-    
+
     this.currentX += dx * this.lerpFactor;
     this.currentY += dy * this.lerpFactor;
 
@@ -99,12 +101,12 @@ const DEPTHTEXT_GLOBAL = {
   updateAll() {
     this.instances.forEach((inst) => {
       if (!inst.isVisible) return;
-      
+
       // POINTER: Use the smoothed global values
       if (inst.options.event === "pointer") {
         inst.tilt(this.currentX, this.currentY);
       }
-      
+
       // SCROLL: Scroll usually doesn't need the same lerp loop unless we want to smooth scroll too.
       // For now, we'll keep scroll direct or we could add separate smoothing for scroll.
       // To fix "trembling" in scroll, we might want to just read values directly.
@@ -131,7 +133,7 @@ const DEPTHTEXT_GLOBAL = {
       // Update TARGET values
       this.targetX = (cx / window.innerWidth - 0.5) * 2;
       this.targetY = (cy / window.innerHeight - 0.5) * 2;
-      
+
       // Start the loop
       this.requestLoop();
     };
@@ -156,7 +158,7 @@ const DEPTHTEXT_GLOBAL = {
     this._scrollHandler = () => {
       // For scroll, we just request a single update (or loop if we wanted scroll smoothing)
       // The original code just requested a tick. Let's just call updateAll directly via RAF to avoid complex scroll-jacking logic for now,
-      // or better, reuse the loop if we want to smooth scroll. 
+      // or better, reuse the loop if we want to smooth scroll.
       // But scroll is usually controlled by the user's scrollbar which is already "smooth" or "direct".
       // Let's just do a direct update for scroll to ensure responsiveness.
       requestAnimationFrame(() => this.updateAll());
@@ -222,6 +224,12 @@ export class DepthTextInstance {
      options validation
   ------------------------- */
   _validateOptions(options: DepthTextOptions): Required<DepthTextOptions> {
+    const normalizeAddClass = (v: any): string => {
+      if (!v && v !== "") return DEPTHTEXT_DEFAULTS.addClass;
+      if (Array.isArray(v)) return v.map(String).join(" ").trim().replace(/\s+/g, " ");
+      return String(v).trim().replace(/\s+/g, " ");
+    };
+
     const merged: Required<DepthTextOptions> = {
       ...DEPTHTEXT_DEFAULTS,
       ...options,
@@ -240,6 +248,7 @@ export class DepthTextInstance {
       eventRotation: options.eventRotation ?? DEPTHTEXT_DEFAULTS.eventRotation,
       eventDirection: options.eventDirection ?? DEPTHTEXT_DEFAULTS.eventDirection,
       perspective: options.perspective ?? DEPTHTEXT_DEFAULTS.perspective,
+      addClass: normalizeAddClass(options.addClass ?? DEPTHTEXT_DEFAULTS.addClass), // Normalized string
     };
     return merged;
   }
@@ -355,7 +364,31 @@ export class DepthTextInstance {
 
     for (let i = 0; i < layers; i++) {
       const layer = document.createElement ? document.createElement("span") : ({} as any);
-      layer.className = "depthtext-layer";
+      const baseClass = "depthtext-layer";
+
+      // set base class first
+      if ((layer as any).classList && (layer as any).classList.add) {
+        (layer as any).classList.add(baseClass);
+        // Add the custom classes (support multiple classes separated by whitespace)
+        if (this.options.addClass) {
+          const clsList = String(this.options.addClass)
+            .split(/\s+/)
+            .map((c) => c.trim())
+            .filter(Boolean);
+          clsList.forEach((c) => {
+            try {
+              (layer as any).classList.add(c);
+            } catch {
+              /* ignore */
+            }
+          });
+        }
+      } else {
+        // fallback for non-DOM envs
+        let layerClass = baseClass;
+        if (this.options.addClass) layerClass += " " + this.options.addClass;
+        (layer as any).className = layerClass;
+      }
 
       // clone template content for each layer
       if (template && (layer as any).appendChild) {
@@ -579,6 +612,8 @@ export function DepthTextify(selectorOrOptions?: string | DepthTextOptions, mayb
         layers: (el as HTMLElement).dataset?.depthLayers as any,
         perspective: (el as HTMLElement).dataset?.depthPerspective as any,
         engaged: (el as HTMLElement).dataset?.depth as any,
+        // Try multiple variants to be tolerant (common HTML attr: data-depth-add-class)
+        addClass: (el as HTMLElement).dataset?.depthAddClass ?? (el as HTMLElement).dataset?.depthAddclass ?? (el as HTMLElement).dataset?.depthAdd ?? (el as HTMLElement).dataset?.addClass ?? undefined,
       };
 
       const mergedOptions = { ...(options || {}), ...(dataOptions || {}) };
